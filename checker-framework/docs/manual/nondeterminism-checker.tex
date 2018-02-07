@@ -1,0 +1,62 @@
+\htmlhr
+\chapter{NonDeterminism Checker\label{nondeterminism-checker}}
+The non-determinism checker identifies locations in source code that might result in different execution outcomes. 
+In particular, it checks for non-determinism that pertains to the use of JAVA Collections.
+Consider the following example:
+\begin{Verbatim}
+	Set<Integer> st = new HashSet<Integer>(); 
+	for(int i = 0 ; i < 10 ; i++)
+		st.add(i);
+	Iterator<Integer> it = st.iterator();
+	while(iterator.hasNext())
+		System.out.println(iterator.next());
+
+\end{Verbatim}
+
+The code above is non-deterministic because a HashSet is not ordered and its elements could be printed in different orders across executions.
+On the other hand, certain Set functions like 'contains' always return deterministic results.
+
+To run the NonDeterminism Checker, supply the
+\code{-processor NonDeterminismChecker}
+command-line option to javac.
+For example: ./bin/javac -cp /Users/rashmi/jsr308/checker-framework/checker/build -processor org.checkerframework.checker.nondeterminism.NonDeterminismChecker /Users/rashmi/NDCheckerTest/src/TestListUnsafe2.java
+
+\section{NonDeterminism annotations for collections\label{nondeterminism-annotations-collections}}
+
+The NonDeterminism type system uses the following annotations:
+\begin{itemize}
+\item
+  \refqualclass{checker/nondeterminism/qual}{ValueNonDet} indicates
+  that the collection can have possibly different values in two different executions.
+\item
+  \refqualclass{checker/nondeterminism/qual}{OrderNonDet} indicates that
+  the collection will have the same elements, but in a possibly different order in two different executions.
+  \code{@ValueNonDet} is a supertype of \code{@OrderNonDet}.
+ \item
+  \refqualclass{checker/nondeterminism/qual}{Det} indicates that
+  the collection will have the same elements, in the same order across all executions.
+  \code{@OrderNonDet} is a supertype of \code{@Det}.
+   It is the default qualifier.
+\item
+  \refqualclass{checker/nondeterminism/qual}{PolyDet and PolyDet2} are qualifiers that are
+  polymorphic over nondeterminism (see Section~\ref{qualifier-polymorphism}).
+\end{itemize}
+
+\section{NonDeterminism annotations for all other types\label{nondeterminism-annotations-elements}}
+
+\begin{itemize}
+\item
+  \refqualclass{checker/nondeterminism/qual}{ValueNonDet} indicates
+  that this type can possibly have different values across different executions. 
+ \item
+  \refqualclass{checker/nondeterminism/qual}{Det} indicates that
+  the value remains the same in any execution.
+\end{itemize}
+
+Note that non-collections may not be annotated as \code{OrderNonDet}
+
+% TODO: one could add a String[] value to @Untainted to distinguish different
+% values, eg @Untainted{``SQL''} versus @Untainted{``HTML''}.
+
+% LocalWords:  quals untaint PolyTainted mis untainting sanitization java
+%%  LocalWords:  TaintingChecker untrusted unvalidated
